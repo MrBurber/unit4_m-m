@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8051 Microcontroller — Unit IV Study Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
+  :root {
+    --bg: #0a0e1a; --panel: #0f1628; --border: #1e3a5f;
+    --accent: #00d4ff; --accent2: #ff6b35; --accent3: #39ff14;
+    --text: #c8d8e8; --dim: #5a7a9a; --highlight: #1a2840;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Exo 2', sans-serif; min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+  .header { text-align: center; padding: 30px 0 20px; }
+  .unit-label { font-family: 'Share Tech Mono', monospace; color: var(--accent); font-size: 11px; letter-spacing: 6px; text-transform: uppercase; opacity: 0.7; margin-bottom: 8px; }
+  .header h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(22px, 5vw, 38px); font-weight: 900; color: #fff; letter-spacing: 2px; text-shadow: 0 0 30px rgba(0,212,255,0.4); }
+  .header h1 span { color: var(--accent); }
+  .subtitle { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: var(--dim); margin-top: 10px; letter-spacing: 3px; }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent); margin: 20px 0; opacity: 0.5; }
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; justify-content: center; }
+  .nav-btn {
+    background: var(--panel); border: 1px solid var(--border); color: var(--dim);
+    font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 1px;
+    padding: 6px 12px; cursor: pointer; transition: all 0.2s; text-transform: uppercase;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
+  .section { display: none; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .card {
+    background: var(--panel); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); padding: 18px 20px; margin-bottom: 14px; position: relative; overflow: hidden;
+  }
+  .card::before { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 60px; background: radial-gradient(circle at top right, rgba(0,212,255,0.06), transparent); }
+  .card.orange { border-left-color: var(--accent2); }
+  .card.green { border-left-color: var(--accent3); }
+  .card-title { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
+  .card.orange .card-title { color: var(--accent2); }
+  .card.green .card-title { color: var(--accent3); }
+  .card p { font-size: 13px; line-height: 1.7; }
+  .card ul { padding-left: 18px; }
+  .card li { font-size: 13px; line-height: 1.8; }
+  .card li::marker { color: var(--accent); }
+  .spec-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .spec-table th { background: rgba(0,212,255,0.08); color: var(--accent); font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .spec-table td { padding: 7px 12px; font-size: 12px; border-bottom: 1px solid rgba(30,58,95,0.5); vertical-align: top; }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table td:first-child { font-family: 'Share Tech Mono', monospace; color: var(--accent2); font-size: 11px; white-space: nowrap; }
+  .instr-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .instr-table th { background: rgba(0,212,255,0.08); color: var(--accent); font-family: 'Share Tech Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .instr-table td { padding: 6px 10px; font-size: 12px; border-bottom: 1px solid rgba(30,58,95,0.4); }
+  .instr-table tr:last-child td { border-bottom: none; }
+  .instr-table td:first-child { font-family: 'Share Tech Mono', monospace; color: var(--accent3); font-size: 12px; letter-spacing: 1px; }
+  .instr-table td:nth-child(2) { color: var(--accent2); font-size: 11px; }
+  .arch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+  .arch-block { background: rgba(0,212,255,0.05); border: 1px solid var(--border); padding: 10px 14px; text-align: center; }
+  .arch-block .blabel { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .arch-block .bval { font-size: 12px; }
+  .badge { display: inline-block; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); color: var(--accent); font-family: 'Share Tech Mono', monospace; font-size: 10px; padding: 2px 7px; margin: 2px 3px 2px 0; letter-spacing: 1px; }
+  .badge.orange { background: rgba(255,107,53,0.1); border-color: rgba(255,107,53,0.3); color: var(--accent2); }
+  .badge.green { background: rgba(57,255,20,0.1); border-color: rgba(57,255,20,0.3); color: var(--accent3); }
+  .highlight-box { background: rgba(0,212,255,0.05); border: 1px dashed rgba(0,212,255,0.3); padding: 10px 14px; margin-top: 10px; font-size: 12px; line-height: 1.7; }
+  .highlight-box strong { color: var(--accent); font-family: 'Share Tech Mono', monospace; font-size: 11px; }
+  h3 { font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--dim); letter-spacing: 2px; text-transform: uppercase; margin: 12px 0 6px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  pre { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #c8d8e8; line-height: 1.8; padding: 4px 0; white-space: pre-wrap; }
+  @media (max-width: 600px) { .two-col, .arch-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="unit-label">// UNIT — IV //</div>
+    <h1>8051 <span>Microcontroller</span></h1>
+    <div class="subtitle">COMPLETE STUDY GUIDE · B.Tech / BCA / MCA</div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="show('intro',this)">Intro &amp; Arch</button>
+    <button class="nav-btn" onclick="show('memory',this)">Memory &amp; I/O</button>
+    <button class="nav-btn" onclick="show('prog',this)">Programming</button>
+    <button class="nav-btn" onclick="show('instr',this)">Instructions</button>
+    <button class="nav-btn" onclick="show('timer',this)">Timer &amp; Interrupts</button>
+  </div>
+
+  <!-- INTRO & ARCHITECTURE -->
+  <div class="section active" id="sec-intro">
+    <div class="card">
+      <div class="card-title">What is the 8051?</div>
+      <p>The <strong>Intel 8051</strong> is an 8-bit single-chip microcontroller introduced in 1980. It integrates CPU, RAM, ROM, I/O ports, timers, and serial communication on a single chip — a complete embedded system solution.</p>
+      <div class="arch-grid">
+        <div class="arch-block"><div class="blabel">Data Bus</div><div class="bval">8-bit</div></div>
+        <div class="arch-block"><div class="blabel">Address Bus</div><div class="bval">16-bit (64KB)</div></div>
+        <div class="arch-block"><div class="blabel">Internal RAM</div><div class="bval">128 bytes</div></div>
+        <div class="arch-block"><div class="blabel">Internal ROM</div><div class="bval">4KB</div></div>
+        <div class="arch-block"><div class="blabel">I/O Ports</div><div class="bval">4 × 8-bit (P0–P3)</div></div>
+        <div class="arch-block"><div class="blabel">Timers</div><div class="bval">2 × 16-bit</div></div>
+        <div class="arch-block"><div class="blabel">Serial Port</div><div class="bval">Full-duplex UART</div></div>
+        <div class="arch-block"><div class="blabel">Interrupts</div><div class="bval">6 sources / 5 vectors</div></div>
+      </div>
+    </div>
+
+    <div class="card orange">
+      <div class="card-title">Special Function Registers (SFRs)</div>
+      <p>SFRs occupy addresses <span class="badge orange">80H–FFH</span> in the internal data memory. Key SFRs:</p>
+      <table class="spec-table">
+        <tr><th>Register</th><th>Address</th><th>Function</th></tr>
+        <tr><td>ACC (A)</td><td>E0H</td><td>Accumulator — main arithmetic register</td></tr>
+        <tr><td>B</td><td>F0H</td><td>B register — used in MUL/DIV</td></tr>
+        <tr><td>PSW</td><td>D0H</td><td>Program Status Word (CY, AC, F0, OV, P flags)</td></tr>
+        <tr><td>SP</td><td>81H</td><td>Stack Pointer (default: 07H)</td></tr>
+        <tr><td>DPTR</td><td>82H–83H</td><td>Data Pointer (DPH:DPL) — 16-bit</td></tr>
+        <tr><td>TCON</td><td>88H</td><td>Timer Control register</td></tr>
+        <tr><td>TMOD</td><td>89H</td><td>Timer Mode register</td></tr>
+        <tr><td>SCON</td><td>98H</td><td>Serial Control register</td></tr>
+        <tr><td>IE</td><td>A8H</td><td>Interrupt Enable register</td></tr>
+        <tr><td>IP</td><td>B8H</td><td>Interrupt Priority register</td></tr>
+      </table>
+    </div>
+
+    <div class="card green">
+      <div class="card-title">Programmer's Model of 8051</div>
+      <ul>
+        <li><strong>Register Banks (0–3):</strong> Four banks of 8 registers (R0–R7). Selected by RS1:RS0 bits in PSW. Bank 0 at 00H–07H.</li>
+        <li><strong>Bit-Addressable Area:</strong> RAM locations 20H–2FH — 128 individually addressable bits.</li>
+        <li><strong>General Purpose RAM:</strong> Scratch-pad area 30H–7FH.</li>
+        <li><strong>Stack:</strong> Grows upward from SP; defaults inside internal RAM (max 128 bytes).</li>
+      </ul>
+      <div class="highlight-box">
+        <strong>PSW Flags:</strong> CY (Carry) · AC (Auxiliary Carry) · F0 (User Flag) · RS1:RS0 (Register Bank Select) · OV (Overflow) · P (Parity)
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMORY & I/O -->
+  <div class="section" id="sec-memory">
+    <div class="card">
+      <div class="card-title">Memory Organization</div>
+      <p>8051 uses <strong>Harvard Architecture</strong> — separate program and data memory spaces accessed via different buses and instructions.</p>
+      <div class="two-col" style="margin-top:12px;">
+        <div>
+          <h3>Program Memory (ROM)</h3>
+          <table class="spec-table">
+            <tr><th>Space</th><th>Range</th></tr>
+            <tr><td>Internal ROM</td><td>0000H–0FFFH (4KB)</td></tr>
+            <tr><td>External ROM</td><td>0000H–FFFFH (64KB)</td></tr>
+            <tr><td>Reset Vector</td><td>0000H</td></tr>
+            <tr><td>Interrupt Vectors</td><td>0003H–002BH</td></tr>
+          </table>
+        </div>
+        <div>
+          <h3>Data Memory (RAM)</h3>
+          <table class="spec-table">
+            <tr><th>Space</th><th>Range</th></tr>
+            <tr><td>Internal RAM</td><td>00H–7FH (128B)</td></tr>
+            <tr><td>SFR Space</td><td>80H–FFH</td></tr>
+            <tr><td>External RAM</td><td>0000H–FFFFH (64KB)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="highlight-box" style="margin-top:12px;">
+        <strong>EA pin:</strong> EA=1 → executes from internal ROM first, then external. EA=0 → always executes from external ROM only.
+      </div>
+      <div class="highlight-box" style="margin-top:8px;">
+        <strong>Access instructions:</strong> MOV → internal RAM/SFR · MOVX → external RAM · MOVC → code/ROM (lookup tables)
+      </div>
+    </div>
+
+    <div class="card orange">
+      <div class="card-title">I/O Ports (P0 – P3)</div>
+      <table class="spec-table">
+        <tr><th>Port</th><th>Type</th><th>Special Function</th></tr>
+        <tr><td>P0</td><td>Open-drain (needs pull-up)</td><td>AD0–AD7: Multiplexed Address/Data bus</td></tr>
+        <tr><td>P1</td><td>True bidirectional</td><td>General purpose I/O only</td></tr>
+        <tr><td>P2</td><td>True bidirectional</td><td>A8–A15: High address byte (external memory)</td></tr>
+        <tr><td>P3</td><td>True bidirectional</td><td>RXD, TXD, INT0̄, INT1̄, T0, T1, WR̄, RD̄</td></tr>
+      </table>
+    </div>
+
+    <div class="card green">
+      <div class="card-title">Memory Interfacing &amp; Control Signals</div>
+      <ul>
+        <li><strong>ALE (Address Latch Enable):</strong> Pulses at Fosc/6. 74LS373 latch demultiplexes P0 into low address byte (A0–A7).</li>
+        <li><strong>PSEN̄ (Program Store Enable):</strong> Goes low during external ROM fetch to enable ROM output.</li>
+        <li><strong>WR̄ / RD̄:</strong> P3.6 / P3.7 — used for external RAM write/read with MOVX instruction.</li>
+        <li><strong>External ROM Access:</strong> PSEN̄ activates, P2 gives high address, P0 gives low address then data.</li>
+        <li><strong>External RAM Access:</strong> MOVX @DPTR,A or MOVX A,@DPTR — WR̄/RD̄ activates on P3.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PROGRAMMING -->
+  <div class="section" id="sec-prog">
+    <div class="card">
+      <div class="card-title">Addressing Modes</div>
+      <table class="spec-table">
+        <tr><th>Mode</th><th>Syntax Example</th><th>Description</th></tr>
+        <tr><td>Immediate</td><td>MOV A, #55H</td><td>Operand is a constant embedded in instruction</td></tr>
+        <tr><td>Register</td><td>MOV A, R2</td><td>Operand is in register R0–R7</td></tr>
+        <tr><td>Direct</td><td>MOV A, 30H</td><td>8-bit address of RAM or SFR</td></tr>
+        <tr><td>Register Indirect</td><td>MOV A, @R0</td><td>Address held in R0 or R1</td></tr>
+        <tr><td>Indexed</td><td>MOVC A, @A+DPTR</td><td>Base+offset; used for lookup tables in ROM</td></tr>
+        <tr><td>Relative</td><td>SJMP label</td><td>Signed 8-bit offset from PC (for branches)</td></tr>
+        <tr><td>Absolute</td><td>AJMP addr11</td><td>11-bit address within same 2KB page</td></tr>
+        <tr><td>Long</td><td>LJMP addr16</td><td>Full 16-bit address anywhere in 64KB</td></tr>
+        <tr><td>Bit</td><td>SETB P1.0</td><td>Direct bit address (20H–2FH area and SFRs)</td></tr>
+      </table>
+    </div>
+
+    <div class="card orange">
+      <div class="card-title">Data Transfer Instructions</div>
+      <table class="instr-table">
+        <tr><th>Mnemonic</th><th>Operation</th><th>Notes</th></tr>
+        <tr><td>MOV dst, src</td><td>dst ← src</td><td>Internal RAM, SFR, Registers</td></tr>
+        <tr><td>MOVX A, @DPTR</td><td>A ← ExtRAM[DPTR]</td><td>External data memory read</td></tr>
+        <tr><td>MOVX @DPTR, A</td><td>ExtRAM[DPTR] ← A</td><td>External data memory write</td></tr>
+        <tr><td>MOVC A, @A+DPTR</td><td>A ← ROM[A+DPTR]</td><td>Read from code memory (table lookup)</td></tr>
+        <tr><td>PUSH direct</td><td>SP++; RAM[SP] ← src</td><td>Push byte onto stack</td></tr>
+        <tr><td>POP direct</td><td>dst ← RAM[SP]; SP--</td><td>Pop byte from stack</td></tr>
+        <tr><td>XCH A, byte</td><td>A ↔ byte</td><td>Exchange accumulator with byte</td></tr>
+        <tr><td>XCHD A, @Ri</td><td>A[3:0] ↔ RAM[Ri][3:0]</td><td>Exchange lower nibbles</td></tr>
+      </table>
+    </div>
+
+    <div class="card green">
+      <div class="card-title">Sample Program — LED Blink on P1.0</div>
+      <pre>
+ORG  0000H
+START:
+    CPL   P1.0       ; Toggle LED on P1.0
+    ACALL DELAY      ; Wait
+    SJMP  START      ; Loop forever
+
+DELAY:
+    MOV   R0, #0FFH  ; Outer count = 255
+D1: MOV   R1, #0FFH  ; Inner count = 255
+D2: DJNZ  R1, D2    ; Inner loop
+    DJNZ  R0, D1    ; Outer loop
+    RET              ; Return to caller
+
+END</pre>
+    </div>
+  </div>
+
+  <!-- INSTRUCTIONS -->
+  <div class="section" id="sec-instr">
+    <div class="card">
+      <div class="card-title">Arithmetic Instructions</div>
+      <table class="instr-table">
+        <tr><th>Mnemonic</th><th>Function</th><th>Flags Affected</th></tr>
+        <tr><td>ADD A, src</td><td>A = A + src</td><td>CY, AC, OV, P</td></tr>
+        <tr><td>ADDC A, src</td><td>A = A + src + CY</td><td>CY, AC, OV, P</td></tr>
+        <tr><td>SUBB A, src</td><td>A = A – src – CY</td><td>CY, AC, OV, P</td></tr>
+        <tr><td>INC A / reg / addr</td><td>operand = operand + 1</td><td>None (except P)</td></tr>
+        <tr><td>DEC A / reg / addr</td><td>operand = operand – 1</td><td>None</td></tr>
+        <tr><td>MUL AB</td><td>B:A = A × B (unsigned 16-bit)</td><td>CY=0, OV</td></tr>
+        <tr><td>DIV AB</td><td>A = quotient, B = remainder</td><td>CY=0, OV if B=0</td></tr>
+        <tr><td>DA A</td><td>Decimal Adjust after BCD add</td><td>CY</td></tr>
+      </table>
+    </div>
+
+    <div class="card orange">
+      <div class="card-title">Logic Instructions</div>
+      <table class="instr-table">
+        <tr><th>Mnemonic</th><th>Function</th></tr>
+        <tr><td>ANL A, src</td><td>A = A AND src (masking)</td></tr>
+        <tr><td>ORL A, src</td><td>A = A OR src (setting bits)</td></tr>
+        <tr><td>XRL A, src</td><td>A = A XOR src (toggling bits)</td></tr>
+        <tr><td>CLR A</td><td>A = 00H (clear accumulator)</td></tr>
+        <tr><td>CPL A</td><td>A = NOT A (bitwise complement)</td></tr>
+        <tr><td>RL A / RR A</td><td>Rotate left/right by 1 bit (no carry)</td></tr>
+        <tr><td>RLC A / RRC A</td><td>Rotate left/right through carry flag</td></tr>
+        <tr><td>SWAP A</td><td>Swap nibbles: A[7:4] ↔ A[3:0]</td></tr>
+        <tr><td>SETB / CLR bit</td><td>Set or clear a single bit</td></tr>
+        <tr><td>ANL / ORL C, bit</td><td>Boolean operations on carry and bit</td></tr>
+      </table>
+    </div>
+
+    <div class="card green">
+      <div class="card-title">Control Transfer Instructions</div>
+      <table class="instr-table">
+        <tr><th>Mnemonic</th><th>Type</th><th>Function</th></tr>
+        <tr><td>LJMP addr16</td><td>Jump</td><td>Long jump to any 64KB address</td></tr>
+        <tr><td>AJMP addr11</td><td>Jump</td><td>Absolute jump within same 2KB page</td></tr>
+        <tr><td>SJMP rel</td><td>Jump</td><td>Short relative jump (–128 to +127)</td></tr>
+        <tr><td>JZ rel</td><td>Conditional</td><td>Jump if A = 0</td></tr>
+        <tr><td>JNZ rel</td><td>Conditional</td><td>Jump if A ≠ 0</td></tr>
+        <tr><td>JC / JNC rel</td><td>Conditional</td><td>Jump if CY = 1 / CY = 0</td></tr>
+        <tr><td>JB / JNB bit,rel</td><td>Bit jump</td><td>Jump if bit set / clear</td></tr>
+        <tr><td>JBC bit,rel</td><td>Bit jump</td><td>Jump if bit set, then clear the bit</td></tr>
+        <tr><td>DJNZ reg,rel</td><td>Loop</td><td>Decrement register and jump if ≠ 0</td></tr>
+        <tr><td>CJNE A,src,rel</td><td>Compare</td><td>Jump if A ≠ src; also sets/clears CY</td></tr>
+        <tr><td>LCALL / ACALL</td><td>Subroutine</td><td>Call subroutine — pushes PC on stack</td></tr>
+        <tr><td>RET</td><td>Return</td><td>Return from subroutine (pop PC)</td></tr>
+        <tr><td>RETI</td><td>Return</td><td>Return from interrupt (re-enables interrupt)</td></tr>
+        <tr><td>NOP</td><td>No-op</td><td>1 machine cycle, no operation (timing)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- TIMER & INTERRUPTS -->
+  <div class="section" id="sec-timer">
+    <div class="card">
+      <div class="card-title">Timer / Counter Programming</div>
+      <p>8051 has <strong>Timer 0 (T0)</strong> and <strong>Timer 1 (T1)</strong> — both 16-bit, configured via TMOD register (not bit-addressable).</p>
+      <h3 style="margin-top:12px;">TMOD Register — Timer Modes</h3>
+      <table class="spec-table">
+        <tr><th>M1:M0</th><th>Mode</th><th>Description</th></tr>
+        <tr><td>00</td><td>Mode 0</td><td>13-bit timer/counter (for 8048 compatibility)</td></tr>
+        <tr><td>01</td><td>Mode 1</td><td>16-bit timer/counter — most commonly used</td></tr>
+        <tr><td>10</td><td>Mode 2</td><td>8-bit auto-reload (TH loaded into TL on overflow)</td></tr>
+        <tr><td>11</td><td>Mode 3</td><td>Split: T0 = two independent 8-bit timers; T1 = frozen</td></tr>
+      </table>
+      <div class="highlight-box" style="margin-top:10px;">
+        <strong>Timer vs Counter:</strong> C/T̄ bit in TMOD. C/T=0 → Timer (counts internal machine cycles = Fosc/12). C/T=1 → Counter (counts falling edges on T0/T1 pin).
+      </div>
+      <div class="highlight-box" style="margin-top:8px;">
+        <strong>Delay Formula (Mode 1, 12 MHz):</strong> Machine cycle = 1 μs. Delay = (65536 – TH:TL initial value) × 1 μs.<br>
+        Example: For 50 ms delay → TH:TL = 65536 – 50000 = 15536 = 3CB0H
+      </div>
+    </div>
+
+    <div class="card orange">
+      <div class="card-title">Interrupt System</div>
+      <p>8051 has <strong>6 interrupt sources</strong> with <strong>2 priority levels</strong> (high/low) configurable via IP register.</p>
+      <table class="spec-table" style="margin-top:10px;">
+        <tr><th>Interrupt</th><th>Vector Address</th><th>Source</th></tr>
+        <tr><td>Reset</td><td>0000H</td><td>Hardware reset (not a true interrupt)</td></tr>
+        <tr><td>INT0̄ (EX0)</td><td>0003H</td><td>External interrupt 0 — P3.2 (level or edge)</td></tr>
+        <tr><td>TF0 (ET0)</td><td>000BH</td><td>Timer 0 overflow flag</td></tr>
+        <tr><td>INT1̄ (EX1)</td><td>0013H</td><td>External interrupt 1 — P3.3 (level or edge)</td></tr>
+        <tr><td>TF1 (ET1)</td><td>001BH</td><td>Timer 1 overflow flag</td></tr>
+        <tr><td>RI/TI (ES)</td><td>0023H</td><td>Serial port — receive complete or transmit empty</td></tr>
+      </table>
+      <h3 style="margin-top:12px;">IE Register (A8H) — Interrupt Enable</h3>
+      <p><span class="badge">EA</span> Global enable (bit 7). Individual enables: <span class="badge orange">EX0</span> <span class="badge orange">ET0</span> <span class="badge orange">EX1</span> <span class="badge orange">ET1</span> <span class="badge orange">ES</span></p>
+      <div class="highlight-box" style="margin-top:10px;">
+        <strong>Default Priority:</strong> INT0 &gt; TF0 &gt; INT1 &gt; TF1 &gt; Serial. Two levels: set bits in IP register for high priority. ISR must end with <span class="badge green">RETI</span> (not RET) to correctly restore interrupt system.
+      </div>
+      <div class="highlight-box" style="margin-top:8px;">
+        <strong>IT0/IT1 bits in TCON:</strong> 0 = level triggered (low level), 1 = edge triggered (falling edge) for INT0̄/INT1̄.
+      </div>
+    </div>
+
+    <div class="card green">
+      <div class="card-title">Serial Communication (UART)</div>
+      <p>Full-duplex serial port using <strong>RXD (P3.0)</strong> and <strong>TXD (P3.1)</strong>. Timer 1 in Mode 2 (auto-reload) is the standard baud rate generator.</p>
+      <table class="spec-table" style="margin-top:10px;">
+        <tr><th>SCON Mode</th><th>SM0:SM1</th><th>Description</th></tr>
+        <tr><td>Mode 0</td><td>00</td><td>Shift register I/O through RXD; fixed Fosc/12</td></tr>
+        <tr><td>Mode 1</td><td>01</td><td>8-bit UART (start + 8 data + stop); variable baud</td></tr>
+        <tr><td>Mode 2</td><td>10</td><td>9-bit UART; fixed baud Fosc/32 or Fosc/64</td></tr>
+        <tr><td>Mode 3</td><td>11</td><td>9-bit UART; variable baud (like Mode 1 + 9th bit)</td></tr>
+      </table>
+      <div class="highlight-box" style="margin-top:10px;">
+        <strong>Baud Rate (Mode 1/3):</strong> Baud = Fosc ÷ (384 × (256 – TH1))<br>
+        Common: 9600 baud @ 11.0592 MHz crystal → TH1 = FDH
+      </div>
+      <div class="highlight-box" style="margin-top:8px;">
+        <strong>SCON bits:</strong> SM0:SM1 (mode) · SM2 (multiprocessor) · REN (receiver enable) · TB8/RB8 (9th bit) · TI (transmit interrupt) · RI (receive interrupt)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
